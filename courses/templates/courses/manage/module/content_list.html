@@ -59,7 +59,7 @@
 {% endwith %}
 {% endblock %}
 
-{% comment %} {% block domready %}
+{% block domready %}
 
     $('#modules').sortable({
         stop: function(event, ui) {
@@ -77,7 +77,7 @@
                 url: '{% url "module_order" %}',
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
-                data: JSON.stringify(modules_order),
+                data: JSON.stringify(modules_order)
             });
 
         }
@@ -97,9 +97,9 @@
                 url: '{% url "content_order" %}',
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
-                data: JSON.stringify(contents_order),
+                data: JSON.stringify(contents_order)
             });
 
         }
     });
-{% endblock %} {% endcomment %}
+{% endblock %}

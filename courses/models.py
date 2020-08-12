@@ -59,7 +59,9 @@ class Module(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     order = OrderField(blank=True, for_fields=['course'])
-    
+    class Meta:
+        ordering = ('order', )
+
     def __str__(self):
         return '{}. {}'.format(self.order, self.title)
 

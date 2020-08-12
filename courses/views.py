@@ -4,12 +4,35 @@ from django.views.generic.base import TemplateResponseMixin, View
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 from django.apps import apps
+from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import modelform_factory
+
+from braces.views import JsonRequestResponseMixin, CsrfExemptMixin
+
 from courses.models import Course, Module, Content
 from courses.forms import ModuleFormset
-
 # Create your views here.
+
+# class CSRFExemptMixin(object):
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, *args, **kwargs):
+#         return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
+
+class ModuleOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
+    def post(self, request):
+        for id, order in self.request_json.items():
+            Module.objects.filter(id=id, course__owner=request.user).update(order=order)
+        return JsonResponse({'saved': 'OK'})        
+
+class ContentOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
+    def post(self, request):
+        for id, order in self.request_json.items():
+            Content.objects.filter(id=id, module__course__owner=request.user).update(order=order)
+        return JsonResponse({'saved': 'OK'})
+
 class OwnerMixin(object):
     def get_queryset(self):
         qs = super(OwnerMixin, self).get_queryset()
