@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+
 from courses.fields import OrderField
 import uuid
 
@@ -39,6 +42,7 @@ class Subject(models.Model):
 class Course(models.Model):
     owner = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.CASCADE)
+    students = models.ManyToManyField(User, related_name='courses_joined', blank=True)
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, editable=False, allow_unicode=True)
     overview = models.TextField()
@@ -85,6 +89,9 @@ class ItemBase(models.Model):
     class Meta:
         abstract = True
 
+    def render(self):
+        return render_to_string('courses/content/{}.html'.format(self._meta.model_name), {'item': self})
+        
     def __str__(self):
         return self.title
 
